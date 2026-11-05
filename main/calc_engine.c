@@ -176,7 +176,7 @@ static void handle_operator(calc_engine_t *engine, calc_key_t op) {
     }
 
     engine->pending_op = op;
-    snprintf(engine->expr, sizeof(engine->expr), "%s %c", engine->display, op_to_char(op));
+    snprintf(engine->expr, sizeof(engine->expr), "%.28s %c", engine->display, op_to_char(op));
     engine->is_new_entry = true;
     engine->evaluated = false;
 }
@@ -186,20 +186,22 @@ static void handle_equals(calc_engine_t *engine) {
 
     if (engine->pending_op != CALC_KEY_NONE) {
         double b = atof(engine->display);
-        char b_str[32];
+        char a_str[24];
+        char b_str[24];
+        format_double(engine->operand_a, a_str, sizeof(a_str));
         format_double(b, b_str, sizeof(b_str));
 
         double res = 0.0;
         if (!compute_binary(engine->operand_a, engine->pending_op, b, &res)) {
-            snprintf(engine->expr, sizeof(engine->expr), "%s %c %s =",
-                     engine->expr, op_to_char(engine->pending_op), b_str);
+            snprintf(engine->expr, sizeof(engine->expr), "%.20s %c %.20s =",
+                     a_str, op_to_char(engine->pending_op), b_str);
             snprintf(engine->display, sizeof(engine->display), "Error: Div by 0");
             engine->has_error = true;
             return;
         }
 
-        snprintf(engine->expr, sizeof(engine->expr), "%s %c %s =",
-                 engine->display, op_to_char(engine->pending_op), b_str);
+        snprintf(engine->expr, sizeof(engine->expr), "%.20s %c %.20s =",
+                 a_str, op_to_char(engine->pending_op), b_str);
         format_double(res, engine->display, sizeof(engine->display));
         engine->operand_a = res;
         engine->pending_op = CALC_KEY_NONE;
