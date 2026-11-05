@@ -1,7 +1,5 @@
 idf_component_register(
     SRCS "main.c"
-         "counter_engine.c"
-         "counter_ui.c"
          "calc_engine.c"
          "calc_ui.c"
          "demo_navigation.c"
